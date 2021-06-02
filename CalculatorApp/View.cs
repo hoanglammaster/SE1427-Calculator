@@ -18,6 +18,10 @@ namespace CalculatorApp
         private void click_Button(object sender, EventArgs e)
         {
             Button button = (Button)sender;
+            if (button.Text.Equals(".") && inputLable.Text.Contains("."))
+            {
+                return;
+            }
             if (inputLable.Text[0] == '0'&&inputLable.Text.Length>=1)
             {
                 inputLable.Text = inputLable.Text.Substring(1);
@@ -26,21 +30,83 @@ namespace CalculatorApp
         }
         private void change_Text(object sender, EventArgs e)
         {
-            int value;
+            
             if (!string.IsNullOrEmpty(inputLable.Text))
             {
                 try
                 {
-                    value = Int32.Parse(inputLable.Text);
                     int input = comboBox1.SelectedIndex;
                     int output = comboBox2.SelectedIndex;
-                    double outputCoeff = Math.Pow(60,output-input);
-                    double outputValue = Double.Parse(inputLable.Text);
-                    outputLable.Text = (outputValue / outputCoeff).ToString();
+                    if (input < 5 && output < 5) 
+                    { 
+                        double outputCoeff = Math.Pow(60, output - input);
+                        double outputValue = Double.Parse(inputLable.Text);
+                        outputLable.Text = (outputValue / outputCoeff).ToString();
+                    }
+                    else
+                    {
+                        double outputCoeff = 1, outputValue;
+                        if(input < output) 
+                        {
+                            for(int i = output; i > input; i--)
+                            {
+                                switch (i)
+                                {
+                                    case 5: outputCoeff *= 24;
+                                        break;
+                                    case 6: outputCoeff *= 7;
+                                        break;
+                                    case 7:
+                                        outputCoeff *= 48;
+                                        break;
+                                    default:outputCoeff *= 60;
+                                        break;
+                                }
+                            }
+                            outputValue = Double.Parse(inputLable.Text);
+                            string outputStr = (outputValue / outputCoeff).ToString();
+                            if (outputStr.Length > 6)
+                            {
+                                outputStr = outputStr.Substring(0,6);
+                            }
+                            outputLable.Text = outputStr;
+                        }
+                        else
+                        {
+                            for (int i = input; i > output; i--)
+                            {
+                                switch (i)
+                                {
+                                    case 5:
+                                        outputCoeff *= 24;
+                                        break;
+                                    case 6:
+                                        outputCoeff *= 7;
+                                        break;
+                                    case 7:
+                                        outputCoeff *= 48;
+                                        break;
+                                    default:
+                                        outputCoeff *= 60;
+                                        break;
+                                }
+                            }
+                            outputValue = Double.Parse(inputLable.Text);
+                            string outputStr = (outputValue / (1 / outputCoeff)).ToString();
+                            if (outputStr.Length > 6)
+                            {
+                                outputStr = outputStr.Substring(0, 6);
+                            }
+                            outputLable.Text = outputStr;
+                        }
+                        
+
+                    }
+                    
                 }
-                catch (InvalidCastException es)
+                catch (FormatException es)
                 {
-                    MessageBox.Show(es.Message);
+                   
                 }
             }
         }
